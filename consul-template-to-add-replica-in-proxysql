@@ -1,0 +1,16 @@
+{{ if keyExists "mysql/master/percona_live/hostname" }}
+DELETE FROM mysql_servers;
+REPLACE into mysql_servers (hostgroup_id, hostname) values ( 1, "{{ key "mysql/master/percona_live/hostname" }}" );
+{{ end }}
+
+{{ range $key, $pairs := tree "mysql/slave/percona_live" | byKey }}
+{{ $get_ip := printf "mysql/slave/percona_live/%s/ip" $key }}
+{{ $get_port := printf "mysql/slave/percona_live/%s/port" $key }}
+replace into mysql_servers (hostgroup_id,hostname,port) values (2, "{{ key $get_ip }}", "{{ key $get_port }}")
+{{ with tree "mysql/slave/percona_live/{{ $key }}/" | explode }}
+{{ key $get_ip }}
+{{ end }}
+{{end}}
+
+LOAD MYSQL SERVERS TO RUNTIME;
+SAVE MYSQL SERVERS TO DISK;
