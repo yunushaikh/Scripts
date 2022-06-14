@@ -1,0 +1,30 @@
+DROP PROCEDURE IF Exists get_filteredTickets_New;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`%` PROCEDURE `get_filteredTickets_New`(
+	IN `pTicketId` INT,
+	IN `pDisplayName` VARCHAR(255),
+	IN `pStartDate` DATE,
+	IN `pEndDate` DATE,
+	IN `pSkip` INT,
+	IN `pLimit` INT
+)
+LANGUAGE SQL
+NOT DETERMINISTIC
+CONTAINS SQL
+SQL SECURITY DEFINER
+COMMENT ''
+BEGIN
+    SELECT * FROM tickets WHERE
+      CASE
+          when (pTicketId > 0) then
+			 tickets.ticketId = pTicketId 
+          when pDisplayName <> '' AND pStartDate = 0 and pEndDate = 0 then
+			 tickets.content like CONCAT ('%', pDisplayName, '%')
+		  when pStartDate > 0 AND pEndDate > 0 then
+             DATE(createdAt) >= pStartDate AND DATE(createdAt) <= pEndDate
+		  when pDisplayName <> '' AND pStartDate > 0 and pEndDate > 0 then
+             tickets.content like CONCAT ('%', pDisplayName, '%') AND DATE(createdAt) >= pStartDate AND DATE(createdAt) <= pEndDate
+      END
+      limit pSkip,pLimit;
+END$$ 
