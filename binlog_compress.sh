@@ -4,7 +4,7 @@ destdir=/var/lib/mysql/
 binlogname=v2dbmain-bin
 excludefile=v2dbmain-bin.index
 retention=5
-timestamp=`date '+%Y-%m-%d'`
+timestamp=`date '+%Y-%m-%d %H:%M:%S'`
 
 find $destdir -name '$binlogname.*' -type f ! -name $excludefile -mmin +$timeinmin -exec gzip {} \;
 if [ $? -eq 0 ]; then
