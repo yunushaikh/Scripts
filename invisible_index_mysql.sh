@@ -11,25 +11,7 @@ CSV_FILENAME="unused_indexes.csv"
 
 # MySQL query to get unused indexes
 QUERY="
-SELECT
-    TABLE_NAME,
-    INDEX_NAME,
-    SEQ_IN_INDEX,
-    COLUMN_NAME
-FROM
-    INFORMATION_SCHEMA.STATISTICS
-WHERE
-    TABLE_SCHEMA = '$DATABASE'
-    AND SEQ_IN_INDEX = 1
-    AND INDEX_NAME NOT IN (
-        SELECT
-            INDEX_NAME
-        FROM
-            INFORMATION_SCHEMA.STATISTICS
-        WHERE
-            TABLE_SCHEMA = '$DATABASE'
-            AND SEQ_IN_INDEX = 1
-    );
+SELECT * from sys.schema_unused_indexes;
 "
 
 # Execute the query and save results to CSV
