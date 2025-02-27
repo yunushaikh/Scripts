@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Function to get current LSN
+get_lsn() {
+    mysql -u root -p'YourPassword' -e "SHOW ENGINE INNODB STATUS\G" | awk '/Log sequence number/ {print $4}'
+}
+
+# Capture initial LSN
+initial_lsn=$(get_lsn)
+echo "Initial LSN: $initial_lsn"
+sleep 60
+
+# Capture LSN after 60 seconds
+final_lsn=$(get_lsn)
+echo "Final LSN after 60s: $final_lsn"
+
+# Calculate growth per minute
+growth_per_min=$((final_lsn - initial_lsn))
+echo "LSN Growth per minute: $growth_per_min"
+
+# Estimate growth for 1 hour
+growth_per_hour=$((growth_per_min * 60))
+echo "Estimated LSN growth in 1 hour: $growth_per_hour"
+
+# Calculate projected LSN after 1 hour
+projected_lsn=$((initial_lsn + growth_per_hour))
+echo "Projected LSN after 1 hour: $projected_lsn"
